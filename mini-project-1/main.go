@@ -6,6 +6,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"text/tabwriter"
 )
 
 type Buku struct {
@@ -28,7 +29,12 @@ func (buku Buku) GetByCode(code string) (Buku, int) {
 	return Buku{}, 0
 }
 
+func main() {
+	optionMenu()
+}
+
 func tambahBuku() {
+	var Buku Buku
 	kodeBuku := ""
 	judulBuku := ""
 	pengarangBuku := ""
@@ -41,20 +47,24 @@ func tambahBuku() {
 	line()
 
 	lineInput("Masukan Kode Buku : ", &kodeBuku)
+	buku, _ := Buku.GetByCode(kodeBuku)
+	if buku.Kode == kodeBuku {
+		fmt.Println("Kode Buku tidak boleh sama!")
+		optionMenu()
+	}
 	lineInput("Masukan Judul Buku : ", &judulBuku)
 	lineInput("Masukan Pengarang Buku : ", &pengarangBuku)
 	lineInput("Masukan Penerbit Buku : ", &penerbitBuku)
 	lineInput("Masukan Jumlah Halaman Buku : ", &jumlahHalBuku)
 	lineInput("Masukan Tahun Terbit Buku : ", &tahunTerbitBuku)
 
-	itemBuku := Buku{
-		Kode:        kodeBuku,
-		Judul:       judulBuku,
-		Pengarang:   pengarangBuku,
-		Penerbit:    penerbitBuku,
-		JumlahHal:   jumlahHalBuku,
-		TahunTerbit: tahunTerbitBuku,
-	}
+	Buku.Kode = kodeBuku
+	Buku.Judul = judulBuku
+	Buku.Pengarang = pengarangBuku
+	Buku.Penerbit = penerbitBuku
+	Buku.JumlahHal = jumlahHalBuku
+	Buku.TahunTerbit = tahunTerbitBuku
+	itemBuku := Buku
 
 	listBuku = append(listBuku, itemBuku)
 
@@ -63,11 +73,13 @@ func tambahBuku() {
 
 func lihatBuku() {
 	line()
-	fmt.Println("Lihat Pesanan")
+	fmt.Println("Daftar Buku")
 	line()
-	fmt.Printf("|Kode\t|Judul\t|Pengarang\t|Penerbit\t|JumlahHal\t|TahunTerbit\t|\n")
+
+	w := tabwriter.NewWriter(os.Stdout, 10, 0, 2, ' ', tabwriter.Debug)
+	fmt.Fprintln(w, "|Kode\tJudul\tPengarang\tPenerbit\tJumlah Hal\tTahun Terbit\t")
 	for _, buku := range listBuku {
-		fmt.Printf("|%s \t|%s\t|%s\t|%s\t|%d\t|%d\t|\n",
+		fmt.Fprintf(w, "|%s\t%s\t%s\t%s\t%d\t%d\t\n",
 			buku.Kode,
 			buku.Judul,
 			buku.Pengarang,
@@ -76,6 +88,7 @@ func lihatBuku() {
 			buku.TahunTerbit,
 		)
 	}
+	w.Flush()
 }
 
 func ubahBuku() {
@@ -95,7 +108,7 @@ func ubahBuku() {
 	buku, index := Buku.GetByCode(kodeBuku)
 	if buku.Kode == "" {
 		fmt.Println("Kode Buku tidak ditemukan!")
-		ubahBuku()
+		optionMenu()
 	}
 	line()
 	countChange := 0
@@ -113,19 +126,19 @@ func ubahBuku() {
 	}
 	confirm = lineConfirm("Apa anda ingin merubah Penerbit Buku? ")
 	if confirm {
-		lineInput("Pengarang Buku Sebelumnya '"+buku.Pengarang+"' : ", &penerbitBuku)
+		lineInput("Penerbit Buku Sebelumnya '"+buku.Penerbit+"' : ", &penerbitBuku)
 		listBuku[index].Penerbit = penerbitBuku
 		countChange += 1
 	}
 	confirm = lineConfirm("Apa anda ingin merubah Jumlah Halaman Buku ? ")
 	if confirm {
-		lineInput("Pengarang Buku Sebelumnya '"+strconv.Itoa(buku.JumlahHal)+"' : ", &jumlahHalBuku)
+		lineInput("Jumlah Halaman Buku Sebelumnya '"+strconv.Itoa(buku.JumlahHal)+"' : ", &jumlahHalBuku)
 		listBuku[index].JumlahHal = jumlahHalBuku
 		countChange += 1
 	}
 	confirm = lineConfirm("Apa anda ingin merubah Tahun Terbit Buku ? ")
 	if confirm {
-		lineInput("Pengarang Buku Sebelumnya '"+strconv.Itoa(buku.TahunTerbit)+"' : ", &tahunTerbitBuku)
+		lineInput("Tahun Terbit Buku Sebelumnya '"+strconv.Itoa(buku.TahunTerbit)+"' : ", &tahunTerbitBuku)
 		listBuku[index].TahunTerbit = tahunTerbitBuku
 		countChange += 1
 	}
@@ -139,10 +152,26 @@ func ubahBuku() {
 }
 
 func hapusBuku() {
+	var Buku Buku
+	kodeBuku := ""
 
-}
+	line()
+	fmt.Println("Hapus Buku")
+	line()
 
-func main() {
+	lineInput("Masukan Kode Buku yang ingin diubah : ", &kodeBuku)
+	buku, index := Buku.GetByCode(kodeBuku)
+	if buku.Kode == "" {
+		fmt.Println("Kode Buku tidak ditemukan!")
+		optionMenu()
+	}
+
+	listBuku = append(
+		listBuku[:index],
+		listBuku[index+1:]...,
+	)
+
+	fmt.Println("Berhasil Menghapus Buku!")
 	optionMenu()
 }
 
@@ -154,11 +183,11 @@ func optionMenu() {
 	fmt.Println("Silakan Pilih Menu : ")
 	fmt.Println("1. Tambah Buku")
 	fmt.Println("2. Lihat Buku")
-	fmt.Println("3. Edit Buku")
+	fmt.Println("3. Ubah Buku")
 	fmt.Println("4. Hapus Buku")
 	fmt.Println("5. Keluar")
 	line()
-	lineInput("Masukan Pilihan: ", &pilihMenu)
+	lineInput("Masukan Pilihan : ", &pilihMenu)
 
 	switch pilihMenu {
 	case 1:
@@ -167,6 +196,8 @@ func optionMenu() {
 		lihatBuku()
 	case 3:
 		ubahBuku()
+	case 4:
+		hapusBuku()
 	case 5:
 		os.Exit(0)
 	}
