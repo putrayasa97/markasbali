@@ -112,31 +112,31 @@ func ubahBuku() {
 	}
 	line()
 	countChange := 0
-	confirm := lineConfirm("Apa anda ingin merubah Judul Buku ? ")
+	confirm := lineConfirm("Apa anda ingin merubah Judul Buku ?")
 	if confirm {
 		lineInput("Judul Buku Sebelumnya '"+buku.Judul+"' : ", &judulBuku)
 		listBuku[index].Judul = judulBuku
 		countChange += 1
 	}
-	confirm = lineConfirm("Apa anda ingin merubah Pengarang Buku ? ")
+	confirm = lineConfirm("Apa anda ingin merubah Pengarang Buku ?")
 	if confirm {
 		lineInput("Pengarang Buku Sebelumnya '"+buku.Pengarang+"' : ", &pengarangBuku)
 		listBuku[index].Pengarang = pengarangBuku
 		countChange += 1
 	}
-	confirm = lineConfirm("Apa anda ingin merubah Penerbit Buku? ")
+	confirm = lineConfirm("Apa anda ingin merubah Penerbit Buku?")
 	if confirm {
 		lineInput("Penerbit Buku Sebelumnya '"+buku.Penerbit+"' : ", &penerbitBuku)
 		listBuku[index].Penerbit = penerbitBuku
 		countChange += 1
 	}
-	confirm = lineConfirm("Apa anda ingin merubah Jumlah Halaman Buku ? ")
+	confirm = lineConfirm("Apa anda ingin merubah Jumlah Halaman Buku ?")
 	if confirm {
 		lineInput("Jumlah Halaman Buku Sebelumnya '"+strconv.Itoa(buku.JumlahHal)+"' : ", &jumlahHalBuku)
 		listBuku[index].JumlahHal = jumlahHalBuku
 		countChange += 1
 	}
-	confirm = lineConfirm("Apa anda ingin merubah Tahun Terbit Buku ? ")
+	confirm = lineConfirm("Apa anda ingin merubah Tahun Terbit Buku ?")
 	if confirm {
 		lineInput("Tahun Terbit Buku Sebelumnya '"+strconv.Itoa(buku.TahunTerbit)+"' : ", &tahunTerbitBuku)
 		listBuku[index].TahunTerbit = tahunTerbitBuku
