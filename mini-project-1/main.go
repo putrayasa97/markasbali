@@ -182,7 +182,7 @@ func optionMenu() {
 	line()
 	fmt.Println("Silakan Pilih Menu : ")
 	fmt.Println("1. Tambah Buku")
-	fmt.Println("2. Lihat Buku")
+	fmt.Println("2. Lihat Daftar Buku")
 	fmt.Println("3. Ubah Buku")
 	fmt.Println("4. Hapus Buku")
 	fmt.Println("5. Keluar")
