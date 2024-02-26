@@ -9,6 +9,7 @@ import (
 	"text/tabwriter"
 )
 
+// struct atau data type untuk atribut buku
 type Buku struct {
 	Kode        string
 	Judul       string
@@ -18,8 +19,11 @@ type Buku struct {
 	TahunTerbit int
 }
 
+// variable slice dengan type Buku
+// untuk menampung list buku yang ditambahkan
 var listBuku []Buku
 
+// Method untuk mencari 1 buku berdasarkan kode buku
 func (buku Buku) GetByCode(code string) (Buku, int) {
 	for index, buku := range listBuku {
 		if buku.Kode == code {
@@ -29,10 +33,12 @@ func (buku Buku) GetByCode(code string) (Buku, int) {
 	return Buku{}, 0
 }
 
+// fungsi Main yang dijalankan pertama kali
 func main() {
 	optionMenu()
 }
 
+// fungsi untuk menambah daftar buku
 func tambahBuku() {
 	var Buku Buku
 	kodeBuku := ""
@@ -71,6 +77,7 @@ func tambahBuku() {
 	fmt.Println("Berhasil Menambah Buku!")
 }
 
+// fungsi untuk melihat daftar buku
 func lihatBuku() {
 	line()
 	fmt.Println("Daftar Buku")
@@ -91,6 +98,8 @@ func lihatBuku() {
 	w.Flush()
 }
 
+// fungsi untuk mengubah data buku
+// berdasarkan kode buku
 func ubahBuku() {
 	var Buku Buku
 	kodeBuku := ""
@@ -151,6 +160,8 @@ func ubahBuku() {
 	optionMenu()
 }
 
+// fungsi untuk menghapus data buku
+// berdasarkan kode buku
 func hapusBuku() {
 	var Buku Buku
 	kodeBuku := ""
@@ -175,10 +186,12 @@ func hapusBuku() {
 	optionMenu()
 }
 
+// fungsi untuk Menu utama dari
+// Aplikasi Manajemen Daftar Buku Perpustakaan
 func optionMenu() {
 	var pilihMenu int
 	line()
-	fmt.Println("Aplikasi Manajemen Daftar Buku Perpustakan")
+	fmt.Println("Aplikasi Manajemen Daftar Buku Perpustakaan")
 	line()
 	fmt.Println("Silakan Pilih Menu : ")
 	fmt.Println("1. Tambah Buku")
@@ -204,10 +217,13 @@ func optionMenu() {
 	main()
 }
 
+// fungsi untuk membuat baris
 func line() {
 	fmt.Println("+-----------------------------------------+")
 }
 
+// fungsi untuk inputan baris
+// berdasarkan type data
 func lineInput(title string, variable interface{}) {
 	var err error
 	fmt.Print(title)
@@ -234,6 +250,7 @@ func lineInput(title string, variable interface{}) {
 	}
 }
 
+// fungsi untuk konfirmasi inputan data
 func lineConfirm(s string) bool {
 	r := bufio.NewReader(os.Stdin)
 
