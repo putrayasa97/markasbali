@@ -276,7 +276,6 @@ func ubahBuku() {
 	}
 
 	dataJson, err := json.Marshal(modalBuku)
-	fmt.Println(dataJson)
 	if err != nil {
 		fmt.Println("Terjadi Error:", err)
 	}
