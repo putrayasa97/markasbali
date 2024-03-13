@@ -8,14 +8,17 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/go-pdf/fpdf"
 )
 
 // Sistem Manajemen Pesanan Restoran
 type Pesanan struct {
-	ID     string
-	Menu   string
-	Meja   int
-	Jumlah int
+	ID      string
+	Menu    string
+	Meja    int
+	Jumlah  int
+	Tanggal time.Time
 }
 
 var ListPesanan []Pesanan
@@ -62,10 +65,11 @@ func TambahPesanan() {
 		}
 
 		draftPesanan = append(draftPesanan, Pesanan{
-			ID:     fmt.Sprintf("PSN-%d", time.Now().Unix()),
-			Menu:   menuPelanggan,
-			Jumlah: jumlahPesananPelanggan,
-			Meja:   mejaPelanggan,
+			ID:      fmt.Sprintf("PSN-%d", time.Now().Unix()),
+			Menu:    menuPelanggan,
+			Jumlah:  jumlahPesananPelanggan,
+			Meja:    mejaPelanggan,
+			Tanggal: time.Now(),
 		})
 
 		var pilihanMenuPersanan = 0
@@ -234,7 +238,8 @@ func main() {
 	fmt.Println("1. Tambah Pesanan")
 	fmt.Println("2. Liat Pesanan")
 	fmt.Println("3. Hapus Pesanan")
-	fmt.Println("4. Keluar")
+	fmt.Println("4. Generate Daftar Pesanan")
+	fmt.Println("5. Keluar")
 	fmt.Println("=================================")
 	fmt.Print("Masukan Pilihan : ")
 
@@ -252,9 +257,42 @@ func main() {
 	case 3:
 		HapusPesanan()
 	case 4:
+		GeneratePdfPesanan()
+	case 5:
 		os.Exit(0)
 	}
 	main()
 }
 
 // go mod tidy
+func GeneratePdfPesanan() {
+	LiatPesanan()
+	fmt.Println("=================================")
+	fmt.Println("Membuat Daftar Pesanan ...")
+	fmt.Println("=================================")
+	pdf := fpdf.New("P", "mm", "A4", "")
+	pdf.AddPage()
+
+	pdf.SetFont("Arial", "", 12)
+	pdf.SetLeftMargin(10)
+	pdf.SetRightMargin(10)
+
+	for i, pesanan := range ListPesanan {
+		pesananText := fmt.Sprintf(
+			"Pesanan #%d:\nID : %s\nMenu : %s\nMeja : %d\nJumlah : %d\nTanggal : %s\n",
+			i+1, pesanan.ID, pesanan.Menu,
+			pesanan.Meja, pesanan.Jumlah,
+			pesanan.Tanggal.Format("2006-01-02 15:04:05"))
+
+		pdf.MultiCell(0, 10, pesananText, "0", "L", false)
+		pdf.Ln(5)
+	}
+
+	err := pdf.OutputFileAndClose(
+		fmt.Sprintf("daftar_pesanan_%s.pdf",
+			time.Now().Format("2006-01-02-15-04-05")))
+
+	if err != nil {
+		fmt.Println("Terjadi error:", err)
+	}
+}
