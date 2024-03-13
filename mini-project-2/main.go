@@ -71,7 +71,7 @@ func getJsonBuku() []Buku {
 		go func(ch <-chan string, chBuku chan Buku, wg *sync.WaitGroup) {
 			var buku Buku
 			for kodeBuku := range ch {
-				dataJson, err := os.ReadFile(fmt.Sprintf("books/book-%s", kodeBuku))
+				dataJson, err := os.ReadFile(fmt.Sprintf("books/%s", kodeBuku))
 				if err != nil {
 					fmt.Println("Terjadi Error:", err)
 				}
@@ -112,7 +112,6 @@ func tambahBuku() {
 
 	os.Mkdir("books", 0777)
 	listBuku = getJsonBuku()
-	fmt.Println(draftListBuku)
 
 	line()
 	fmt.Println("Tambah Buku")
@@ -155,7 +154,7 @@ func tambahBuku() {
 	optionMenu()
 }
 
-// fungis proses untuk menyimpan buku dalam bentuk json
+// fungsi proses untuk menyimpan buku dalam bentuk json
 func prosesSimpanBuku() {
 	fmt.Println("Menambah Buku ...")
 
@@ -194,6 +193,7 @@ func prosesSimpanBuku() {
 
 // fungsi untuk melihat daftar buku
 func lihatBuku() {
+	listBuku = getJsonBuku()
 	line()
 	fmt.Println("Daftar Buku")
 	line()
@@ -216,54 +216,57 @@ func lihatBuku() {
 // fungsi untuk mengubah data buku
 // berdasarkan kode buku
 func ubahBuku() {
-	var Buku Buku
+	var modalBuku Buku
 	kodeBuku := ""
 	judulBuku := ""
 	pengarangBuku := ""
 	penerbitBuku := ""
 	jumlahHalBuku := 0
 	tahunTerbitBuku := 0
+	listBuku = []Buku{}
 
+	listBuku = getJsonBuku()
 	line()
 	fmt.Println("Ubah Buku")
 	line()
 
 	lineInput("Masukan Kode Buku yang ingin diubah : ", &kodeBuku)
-	buku, index := Buku.getByCode(kodeBuku)
+	buku, _ := modalBuku.getByCode(kodeBuku)
 	if buku.Kode == "" {
 		fmt.Println("Kode Buku tidak ditemukan!")
 		optionMenu()
 	}
+	modalBuku = buku
 	line()
 	countChange := 0
 	confirm := lineConfirm("Apa anda ingin merubah Judul Buku ?")
 	if confirm {
 		lineInput("Judul Buku Sebelumnya '"+buku.Judul+"' : ", &judulBuku)
-		listBuku[index].Judul = judulBuku
+		modalBuku.Judul = judulBuku
 		countChange += 1
 	}
 	confirm = lineConfirm("Apa anda ingin merubah Pengarang Buku ?")
 	if confirm {
 		lineInput("Pengarang Buku Sebelumnya '"+buku.Pengarang+"' : ", &pengarangBuku)
-		listBuku[index].Pengarang = pengarangBuku
+		modalBuku.Pengarang = pengarangBuku
 		countChange += 1
 	}
 	confirm = lineConfirm("Apa anda ingin merubah Penerbit Buku?")
 	if confirm {
 		lineInput("Penerbit Buku Sebelumnya '"+buku.Penerbit+"' : ", &penerbitBuku)
-		listBuku[index].Penerbit = penerbitBuku
+		modalBuku.Penerbit = penerbitBuku
 		countChange += 1
 	}
 	confirm = lineConfirm("Apa anda ingin merubah Jumlah Halaman Buku ?")
 	if confirm {
 		lineInput("Jumlah Halaman Buku Sebelumnya '"+strconv.Itoa(buku.JumlahHal)+"' : ", &jumlahHalBuku)
-		listBuku[index].JumlahHal = jumlahHalBuku
+		modalBuku.JumlahHal = jumlahHalBuku
 		countChange += 1
 	}
 	confirm = lineConfirm("Apa anda ingin merubah Tahun Terbit Buku ?")
 	if confirm {
 		lineInput("Tahun Terbit Buku Sebelumnya '"+strconv.Itoa(buku.TahunTerbit)+"' : ", &tahunTerbitBuku)
-		listBuku[index].TahunTerbit = tahunTerbitBuku
+		modalBuku.TahunTerbit = tahunTerbitBuku
 		countChange += 1
 	}
 
@@ -271,6 +274,18 @@ func ubahBuku() {
 		fmt.Println("Tidak ada perubahan data buku!")
 		return
 	}
+
+	dataJson, err := json.Marshal(modalBuku)
+	fmt.Println(dataJson)
+	if err != nil {
+		fmt.Println("Terjadi Error:", err)
+	}
+
+	err = os.WriteFile(fmt.Sprintf("books/book-%s.json", buku.Kode), dataJson, 0644)
+	if err != nil {
+		fmt.Println("Terjadi Error:", err)
+	}
+
 	fmt.Println("Berhasil Merubah Buku!")
 	optionMenu()
 }
@@ -278,24 +293,25 @@ func ubahBuku() {
 // fungsi untuk menghapus data buku
 // berdasarkan kode buku
 func hapusBuku() {
-	var Buku Buku
+	var modelBuku Buku
 	kodeBuku := ""
-
+	listBuku = []Buku{}
+	listBuku = getJsonBuku()
 	line()
 	fmt.Println("Hapus Buku")
 	line()
 
 	lineInput("Masukan Kode Buku yang ingin diubah : ", &kodeBuku)
-	buku, index := Buku.getByCode(kodeBuku)
+	buku, index := modelBuku.getByCode(kodeBuku)
 	if buku.Kode == "" {
 		fmt.Println("Kode Buku tidak ditemukan!")
 		optionMenu()
 	}
 
-	listBuku = append(
-		listBuku[:index],
-		listBuku[index+1:]...,
-	)
+	err := os.Remove(fmt.Sprintf("books/book-%s.json", listBuku[index].Kode))
+	if err != nil {
+		fmt.Println("Terjadi error:", err)
+	}
 
 	fmt.Println("Berhasil Menghapus Buku!")
 	optionMenu()
