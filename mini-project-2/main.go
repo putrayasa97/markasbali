@@ -9,6 +9,9 @@ import (
 	"strings"
 	"sync"
 	"text/tabwriter"
+	"time"
+
+	"github.com/go-pdf/fpdf"
 )
 
 // struct atau data type untuk atribut buku
@@ -316,6 +319,40 @@ func hapusBuku() {
 	optionMenu()
 }
 
+// fungsi untuk cetak data buku
+func printBuku() {
+	line()
+	fmt.Println("Hapus Buku")
+	line()
+	listBuku = getJsonBuku()
+	pdf := fpdf.New("P", "mm", "A4", "")
+	pdf.AddPage()
+
+	pdf.SetFont("Arial", "", 12)
+	pdf.SetLeftMargin(10)
+	pdf.SetRightMargin(10)
+
+	for _, buku := range listBuku {
+		bukuText := fmt.Sprintf(
+			"Buku: \nKode : %s\nJudul : %s\nPengarang : %s\nPenerbit : %s\nJumlah Halaman : %d\nTahun Terbit : %d",
+			buku.Kode, buku.Judul,
+			buku.Pengarang, buku.Penerbit,
+			buku.JumlahHal, buku.TahunTerbit)
+
+		pdf.MultiCell(0, 10, bukuText, "0", "L", false)
+		pdf.Ln(5)
+	}
+
+	err := pdf.OutputFileAndClose(
+		fmt.Sprintf("daftar_buku_%s.pdf",
+			time.Now().Format("2006-01-02-15-04-05")))
+
+	if err != nil {
+		fmt.Println("Terjadi error:", err)
+	}
+	optionMenu()
+}
+
 // fungsi untuk Menu utama dari
 // Aplikasi Manajemen Daftar Buku Perpustakaan
 func optionMenu() {
@@ -328,7 +365,8 @@ func optionMenu() {
 	fmt.Println("2. Lihat Daftar Buku")
 	fmt.Println("3. Ubah Buku")
 	fmt.Println("4. Hapus Buku")
-	fmt.Println("5. Keluar")
+	fmt.Println("5. Print Buku")
+	fmt.Println("6. Keluar")
 	line()
 	lineInput("Masukan Pilihan : ", &pilihMenu)
 
@@ -342,6 +380,8 @@ func optionMenu() {
 	case 4:
 		hapusBuku()
 	case 5:
+		printBuku()
+	case 6:
 		os.Exit(0)
 	}
 	main()
