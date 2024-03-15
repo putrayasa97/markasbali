@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -99,6 +100,11 @@ func getJsonBuku() []Buku {
 	for dataBuku := range chBuku {
 		listBuku = append(listBuku, dataBuku)
 	}
+
+	sort.Slice(listBuku, func(i, j int) bool {
+		return listBuku[i].Kode < listBuku[j].Kode
+	})
+
 	return listBuku
 }
 
@@ -322,9 +328,53 @@ func hapusBuku() {
 // fungsi untuk cetak data buku
 func printBuku() {
 	line()
-	fmt.Println("Hapus Buku")
+	fmt.Println("Print Buku")
 	line()
+	os.Mkdir("pdf", 0777)
+
+	optionPrint()
+
+	fmt.Println("Berhasil print buku")
+	optionMenu()
+}
+
+// fungsi untuk opsi print
+func optionPrint() {
+	var opsiPrint int
+	fmt.Println("Silakan pilih opsi print : ")
+	fmt.Println("1. Print Berdasarkan Kode Buku")
+	fmt.Println("2. Print Semua Buku")
+	fmt.Println("3. Kembali ke menu utama")
+	line()
+	lineInput("Masukan Pilihan : ", &opsiPrint)
+
+	switch opsiPrint {
+	case 1:
+		printByCodeBook()
+	case 2:
+		printAllBook()
+	case 3:
+		optionMenu()
+	case 4:
+		os.Exit(0)
+	}
+}
+
+// fungsi untuk print berdasarkan kode
+func printByCodeBook() {
+	var modelBuku Buku
+	kodeBuku := ""
+	listBuku = []Buku{}
 	listBuku = getJsonBuku()
+
+	lineInput("Masukan Kode Buku yang ingin diprint : ", &kodeBuku)
+	buku, _ := modelBuku.getByCode(kodeBuku)
+	if buku.Kode == "" {
+		fmt.Println("Kode Buku tidak ditemukan!")
+		optionPrint()
+	}
+	modalBuku := buku
+
 	pdf := fpdf.New("P", "mm", "A4", "")
 	pdf.AddPage()
 
@@ -332,25 +382,80 @@ func printBuku() {
 	pdf.SetLeftMargin(10)
 	pdf.SetRightMargin(10)
 
-	for _, buku := range listBuku {
-		bukuText := fmt.Sprintf(
-			"Buku: \nKode : %s\nJudul : %s\nPengarang : %s\nPenerbit : %s\nJumlah Halaman : %d\nTahun Terbit : %d",
-			buku.Kode, buku.Judul,
-			buku.Pengarang, buku.Penerbit,
-			buku.JumlahHal, buku.TahunTerbit)
+	bukuText := fmt.Sprintf(
+		"Kode Buku : %s\nJudul : %s\nPengarang : %s\nPenerbit : %s\nJumlah Halaman : %d\nTahun Terbit : %d \n",
+		modalBuku.Kode, modalBuku.Judul,
+		modalBuku.Pengarang, modalBuku.Penerbit,
+		modalBuku.JumlahHal, modalBuku.TahunTerbit)
 
-		pdf.MultiCell(0, 10, bukuText, "0", "L", false)
+	pdf.MultiCell(0, 10, bukuText, "0", "L", false)
+	pdf.Ln(5)
+
+	err := pdf.OutputFileAndClose(
+		fmt.Sprintf("pdf/buku_%s_%s.pdf",
+			modalBuku.Kode, time.Now().Format("2006-01-02-15-04-05")))
+
+	if err != nil {
+		fmt.Println("Terjadi error:", err)
+	}
+}
+
+// fungsi untuk print semua buku
+func printAllBook() {
+	listBuku = []Buku{}
+	listBuku = getJsonBuku()
+
+	pdf := fpdf.New("P", "mm", "A4", "")
+	pdf.AddPage()
+
+	pdf.SetFont("Arial", "", 12)
+	pdf.SetLeftMargin(10)
+	pdf.SetRightMargin(10)
+
+	fmt.Println("Menambah Print Buku ...")
+
+	ch := make(chan Buku)
+
+	chpdf := make(chan string, len(listBuku))
+
+	wg := sync.WaitGroup{}
+
+	jmlThread := 5
+
+	for i := 0; i < jmlThread; i++ {
+		wg.Add(1)
+		go func(ch <-chan Buku, chpdf chan string, wg *sync.WaitGroup) {
+			for buku := range ch {
+				chpdf <- fmt.Sprintf(
+					"Kode Buku : %s\nJudul : %s\nPengarang : %s\nPenerbit : %s\nJumlah Halaman : %d\nTahun Terbit : %d \n",
+					buku.Kode, buku.Judul,
+					buku.Pengarang, buku.Penerbit,
+					buku.JumlahHal, buku.TahunTerbit)
+			}
+			wg.Done()
+		}(ch, chpdf, &wg)
+	}
+
+	for _, buku := range listBuku {
+		ch <- buku
+	}
+
+	close(ch)
+	wg.Wait()
+	close(chpdf)
+
+	for text := range chpdf {
+		pdf.MultiCell(0, 10, text, "0", "L", false)
 		pdf.Ln(5)
 	}
 
 	err := pdf.OutputFileAndClose(
-		fmt.Sprintf("daftar_buku_%s.pdf",
+		fmt.Sprintf("pdf/daftar_buku_%s.pdf",
 			time.Now().Format("2006-01-02-15-04-05")))
 
 	if err != nil {
 		fmt.Println("Terjadi error:", err)
 	}
-	optionMenu()
 }
 
 // fungsi untuk Menu utama dari
