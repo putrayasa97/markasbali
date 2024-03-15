@@ -209,16 +209,36 @@ func lihatBuku() {
 
 	w := tabwriter.NewWriter(os.Stdout, 10, 0, 2, ' ', tabwriter.Debug)
 	fmt.Fprintln(w, "|Kode\tJudul\tPengarang\tPenerbit\tJumlah Hal\tTahun Terbit\t")
-	for _, buku := range listBuku {
-		fmt.Fprintf(w, "|%s\t%s\t%s\t%s\t%d\t%d\t\n",
-			buku.Kode,
-			buku.Judul,
-			buku.Pengarang,
-			buku.Penerbit,
-			buku.JumlahHal,
-			buku.TahunTerbit,
-		)
+
+	wg := sync.WaitGroup{}
+	ch := make(chan Buku)
+
+	jmlThread := 5
+
+	for i := 0; i < jmlThread; i++ {
+		wg.Add(1)
+		go func(ch <-chan Buku, w *tabwriter.Writer, wg *sync.WaitGroup) {
+			for buku := range ch {
+				fmt.Fprintf(w, "|%s\t%s\t%s\t%s\t%d\t%d\t\n",
+					buku.Kode,
+					buku.Judul,
+					buku.Pengarang,
+					buku.Penerbit,
+					buku.JumlahHal,
+					buku.TahunTerbit,
+				)
+			}
+			wg.Done()
+		}(ch, w, &wg)
 	}
+
+	for _, buku := range listBuku {
+		ch <- buku
+	}
+
+	close(ch)
+	wg.Wait()
+
 	w.Flush()
 }
 
