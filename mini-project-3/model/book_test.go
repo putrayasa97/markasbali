@@ -11,7 +11,7 @@ import (
 )
 
 func Init() {
-	err := godotenv.Load(".env")
+	err := godotenv.Load("../.env")
 	if err != nil {
 		fmt.Println("env not found, using system env")
 	}
@@ -36,7 +36,6 @@ func TestBookCreate(t *testing.T) {
 	// create data buku
 	err := bookData.Create(config.Mysql.DB)
 	assert.Nil(t, err)
-	fmt.Println(bookData.ID)
 }
 
 func TestBookGetByID(t *testing.T) {
@@ -62,7 +61,7 @@ func TestBookGetByID(t *testing.T) {
 	// get data buku yg telah dibuat
 	book, err := bookData.GetByID(config.Mysql.DB)
 	assert.Nil(t, err)
-	fmt.Println(book)
+	assert.Equal(t, bookData.ID, book.ID)
 }
 
 func TestBookGetAll(t *testing.T) {
@@ -84,7 +83,6 @@ func TestBookGetAll(t *testing.T) {
 
 	assert.Nil(t, err)
 	assert.GreaterOrEqual(t, len(books), 1)
-	fmt.Println(books)
 }
 
 func TestBookUpdateByID(t *testing.T) {
@@ -151,7 +149,6 @@ func TestDeleteByID(t *testing.T) {
 
 	// cek data buku yg dibuat dengan yg di get
 	book, err := bookData.GetByID(config.Mysql.DB)
-	fmt.Println(book)
 	assert.Nil(t, err)
 	assert.Equal(t, bookData.ID, book.ID)
 
