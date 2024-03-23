@@ -10,7 +10,7 @@ import (
 
 var modelBook model.Book
 
-func BookUpdate() bool {
+func BookUpdate() {
 	bookID := 0
 	bookISBN := ""
 	bookJudul := ""
@@ -30,7 +30,6 @@ func BookUpdate() bool {
 	book, err := modelBook.GetByID(config.Mysql.DB)
 	if err != nil {
 		fmt.Println("Buku tidak ditemukan !")
-		return false
 	}
 
 	helpers.Line()
@@ -75,12 +74,10 @@ func BookUpdate() bool {
 
 	if countChange == 0 {
 		fmt.Println("Tidak ada perubahan data buku!")
-		return false
 	}
 
 	bookUpdate()
 	fmt.Println("Berhasil Merubah Buku!")
-	return true
 }
 
 func bookUpdate() {
