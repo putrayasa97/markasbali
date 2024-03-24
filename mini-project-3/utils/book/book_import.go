@@ -18,7 +18,7 @@ func BookImport() {
 	file, err := os.Open(pathFile)
 	if err != nil {
 		fmt.Println("Terjadi Error:", err)
-		return
+		BookImport()
 	}
 	defer file.Close()
 
