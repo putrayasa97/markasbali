@@ -30,8 +30,8 @@ func MainMenu() {
 		book.BookUpdate()
 	case 4:
 		book.BookDelete()
-	// case 5:
-	// 	printBuku()
+	case 5:
+		PrintMenu()
 	case 6:
 		os.Exit(0)
 	}
