@@ -27,7 +27,7 @@ func BookGet() {
 	wg := sync.WaitGroup{}
 	chGetData := make(chan model.Book)
 	chShow := make(chan model.Book, len(books))
-	jmlThread := 5
+	jmlThread := 1
 
 	for i := 0; i < jmlThread; i++ {
 		wg.Add(1)
@@ -43,13 +43,10 @@ func BookGet() {
 	close(chShow)
 
 	for book := range chShow {
-		fmt.Fprintf(w, "|%d\t%s\t%s\t%s\t%d\t%d\t\n",
+		fmt.Fprintf(w, "|%d\t%s\t%s\t\n",
 			book.ID,
 			book.ISBN,
 			book.Judul,
-			book.Penulis,
-			book.Tahun,
-			book.Stok,
 		)
 	}
 

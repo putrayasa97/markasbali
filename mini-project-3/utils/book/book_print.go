@@ -73,13 +73,14 @@ func BookPrintAll() {
 
 	wg := sync.WaitGroup{}
 
-	jmlThread := 5
+	jmlThread := 1
 	for i := 0; i < jmlThread; i++ {
 		wg.Add(1)
 		go func(ch <-chan model.Book, chpdf chan string, wg *sync.WaitGroup) {
 			for book := range ch {
 				chpdf <- fmt.Sprintf(
-					"ISBN : %s\nJudul : %s\nPenulis : %s\nTahun : %d\nStok : %d\nGambar : %s \n",
+					"ID : %d\nISBN : %s\nJudul : %s\nPenulis : %s\nTahun : %d\nStok : %d\nGambar : %s \n",
+					book.ID,
 					book.ISBN, book.Judul,
 					book.Penulis, book.Tahun,
 					book.Stok, book.Gambar)
