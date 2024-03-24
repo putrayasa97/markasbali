@@ -18,7 +18,8 @@ func MainMenu() {
 	fmt.Println("3. Ubah Buku")
 	fmt.Println("4. Hapus Buku")
 	fmt.Println("5. Print Buku")
-	fmt.Println("6. Keluar")
+	fmt.Println("6. Import Buku")
+	fmt.Println("7. Keluar")
 	helpers.Line()
 	helpers.LineInput("Masukan Pilihan : ", &pilihMenu)
 	switch pilihMenu {
@@ -33,6 +34,8 @@ func MainMenu() {
 	case 5:
 		PrintMenu()
 	case 6:
+		book.BookImport()
+	case 7:
 		os.Exit(0)
 	}
 	MainMenu()
