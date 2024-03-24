@@ -32,8 +32,8 @@ func BookPrintByID() {
 	pdf.SetRightMargin(10)
 
 	bookText := fmt.Sprintf(
-		"ISBN : %s\nJudul : %s\nPenulis : %s\nTahun : %d\nStok : %d\nGambar : %s \n",
-		book.ISBN, book.Judul,
+		"ID : %d\nISBN : %s\nJudul : %s\nPenulis : %s\nTahun : %d\nStok : %d\nGambar : %s \n",
+		book.ID, book.ISBN, book.Judul,
 		book.Penulis, book.Tahun,
 		book.Stok, book.Gambar)
 

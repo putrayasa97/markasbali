@@ -37,7 +37,7 @@ func BookUpdate() {
 	countChange := 0
 	confirm := helpers.LineConfirm("Apa anda ingin merubah ISBN Buku ?")
 	if confirm {
-		helpers.LineInput("Judul Buku Sebelumnya '"+book.ISBN+"' : ", &bookISBN)
+		helpers.LineInput("ISBN Buku Sebelumnya '"+book.ISBN+"' : ", &bookISBN)
 		modelBook.ISBN = bookISBN
 		countChange += 1
 	}
@@ -59,15 +59,15 @@ func BookUpdate() {
 		modelBook.Tahun = uint(bookTahun)
 		countChange += 1
 	}
-	confirm = helpers.LineConfirm("Apa anda ingin merubah Jumlah Gambar Buku ?")
+	confirm = helpers.LineConfirm("Apa anda ingin merubah Gambar Buku ?")
 	if confirm {
-		helpers.LineInput("Jumlah Halaman Buku Sebelumnya '"+book.Gambar+"' : ", &bookGambar)
+		helpers.LineInput("Gambar Buku Sebelumnya '"+book.Gambar+"' : ", &bookGambar)
 		modelBook.Gambar = bookGambar
 		countChange += 1
 	}
 	confirm = helpers.LineConfirm("Apa anda ingin merubah Stok Buku ?")
 	if confirm {
-		helpers.LineInput("Tahun Terbit Buku Sebelumnya '"+strconv.Itoa(int(book.Stok))+"' : ", &bookStok)
+		helpers.LineInput("Stok Buku Sebelumnya '"+strconv.Itoa(int(book.Stok))+"' : ", &bookStok)
 		modelBook.Stok = uint(bookStok)
 		countChange += 1
 	}

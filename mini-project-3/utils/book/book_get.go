@@ -16,8 +16,8 @@ func BookGet() {
 	helpers.Line()
 	modelBook := model.Book{}
 
-	w := tabwriter.NewWriter(os.Stdout, 10, 0, 2, ' ', tabwriter.Debug)
-	fmt.Fprintln(w, "|ID\tISBN\tJudul\tPenulis\tTahun\tStok\t")
+	w := tabwriter.NewWriter(os.Stdout, 8, 0, 2, ' ', tabwriter.Debug)
+	fmt.Fprintln(w, "|ID\tISBN\tTahun\tStok\tJudul\t")
 
 	books, err := modelBook.GetAll(config.Mysql.DB)
 	if err != nil {
@@ -43,9 +43,11 @@ func BookGet() {
 	close(chShow)
 
 	for book := range chShow {
-		fmt.Fprintf(w, "|%d\t%s\t%s\t\n",
+		fmt.Fprintf(w, "|%d\t%s\t%d\t%d\t%s\n",
 			book.ID,
 			book.ISBN,
+			book.Tahun,
+			book.Stok,
 			book.Judul,
 		)
 	}

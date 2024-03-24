@@ -6,12 +6,16 @@ import (
 	"os"
 	"sekolahbeta/mini-project-3/config"
 	"sekolahbeta/mini-project-3/model"
+	"sekolahbeta/mini-project-3/utils/helpers"
 	"strconv"
 	"sync"
 )
 
 func BookImport() {
-	file, err := os.Open("sample_books.csv")
+	pathFile := ""
+	helpers.LineInput("Masukan path file yang ingin diimport : ", &pathFile)
+
+	file, err := os.Open(pathFile)
 	if err != nil {
 		fmt.Println("Terjadi Error:", err)
 		return
